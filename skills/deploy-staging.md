@@ -116,9 +116,9 @@ git merge --no-ff --no-edit "origin/$B" -m "integrate $B — <scope>"
   weren't attempted. Ask a human.
 
 **Never auto-resolve a conflict between two agents' work.** A conflict means
-two workstreams made incompatible assumptions. That's a design question wearing
-a merge conflict's clothing, and resolving it by picking a side ships a
-decision nobody made.
+two workstreams made incompatible assumptions about the same code. That's a
+design question, not a merge problem — and resolving it by picking a side ships
+a decision nobody actually made.
 
 ---
 

@@ -1,8 +1,9 @@
 # Seven Principles
 
-Each of these has a scar behind it. I've kept the incidents in, because a rule
-without the failure that produced it is just an opinion, and you can't tell
-which opinions to keep.
+Each of these has a scar behind it. The incidents are here because they're how
+you decide whether a rule is yours to adopt: if the same failure is possible in
+your system, take the rule. If it isn't, skip it. You can't make that call from
+the rule alone.
 
 ---
 
@@ -243,8 +244,9 @@ Two smaller rules keep it honest:
 - If the suggestion can't be stated in two lines, it isn't ready to be
   suggested. Log it and say so.
 - A run that went exactly as expected produces **nothing**. No write-up, no
-  suggestion. Otherwise the log fills with noise and stops being read — which
-  is principle 4 again, in a different costume.
+  suggestion. Otherwise the log fills with routine entries and stops being
+  read — principle 4 again: something that fires constantly stops carrying
+  information.
 
 ---
 

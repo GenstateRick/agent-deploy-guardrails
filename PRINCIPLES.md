@@ -216,8 +216,8 @@ code path is actually gated. Grep-level compliance is not compliance.
 **This is the single highest-leverage control in the whole system**, and it's
 the one I'd copy first if I could only copy one. Not because agents lie —
 because "this is fine, it's covered by X" is a claim, and claims are checkable.
-The cost of requiring a citation is seconds. The cost of accepting an assertion
-is however long it takes you to find out.
+Asking for the citation is nearly free. Accepting the assertion is a bet on a
+claim nobody checked.
 
 It's also the control that transfers most cleanly to human organisations, where
 "don't worry, legal already looked at it" is load-bearing far more often than

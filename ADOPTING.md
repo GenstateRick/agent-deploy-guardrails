@@ -7,7 +7,7 @@ implement these — in this order.
 
 ## 1. Write down what each gate does not prove
 
-**Time: an afternoon. Cost: nothing. Value: the highest here.**
+**The highest-value item here, and it changes nothing about your code.**
 
 Go through your existing pipeline. For every job, write one sentence stating
 what it does *not* prove, as a comment above the job.
@@ -30,7 +30,7 @@ a green pipeline, which is most of the benefit and available immediately.
 
 ## 2. Require evidence for claimed exemptions
 
-**Time: one paragraph in your review policy. Value: disproportionate.**
+**One paragraph in your review policy. Disproportionate return.**
 
 Whenever a change claims it's safe because of an existing control — a feature
 flag, a permission check, an upstream validation — the claim must cite the file
@@ -39,15 +39,15 @@ when the control is off.
 
 Can't cite both? The claim is refused and the change gets full review.
 
-This costs seconds and closes the largest hole in any review process, human or
-machine: the plausible assurance nobody checks. It's also the rule that ports
-furthest outside engineering.
+It closes the largest hole in any review process, human or machine: the
+plausible assurance nobody checks. It's also the rule that ports furthest
+outside engineering.
 
 ---
 
 ## 3. Tier your scrutiny
 
-**Time: a day. Value: it's what makes the rest sustainable.**
+**This is what makes everything else sustainable.**
 
 Pick your tripwires — the paths and content patterns that mean "this could
 cost real money." Everything else gets standard review; tripwire matches get
@@ -59,10 +59,10 @@ Do it in this order:
    records live.
 2. **Add content patterns**, because money moves through files nobody thought
    to list. Match against added lines only.
-3. **Make trivial changes actually trivial.** If a documentation edit takes the
-   same twenty minutes as a schema migration, people will batch changes to
-   avoid the overhead — and batching is how a risky change rides along
-   unnoticed inside a large diff.
+3. **Make trivial changes actually trivial.** If a documentation edit runs the
+   same gauntlet as a schema migration, people will batch changes to avoid the
+   overhead — and batching is how a risky change rides along unnoticed inside
+   a large diff.
 
 The last point is the one teams get wrong. Making the cheap path genuinely
 cheap is a *safety* measure, not a convenience.

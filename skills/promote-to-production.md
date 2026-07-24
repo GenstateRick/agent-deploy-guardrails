@@ -145,8 +145,8 @@ list. The path list is a proxy; the content patterns are the backstop.
 
 Every changed path is docs, markdown, or comments; no migrations; nothing under
 source, scripts, CI, or config. State the tier, state the file list, go to
-step 5. No review. This is what keeps documentation changes from costing twenty
-minutes.
+step 5. No review. This is what keeps a documentation change from paying for
+scrutiny it doesn't need.
 
 ### Tier 1 — Standard code
 

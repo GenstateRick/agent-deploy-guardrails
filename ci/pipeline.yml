@@ -1,0 +1,153 @@
+# Example CI pipeline — GitHub Actions syntax, but the structure is portable.
+#
+# The distinguishing feature of this file is not the jobs. It's that every job
+# carries a "DOES NOT PROVE" comment. That habit is the cheapest, highest-value
+# thing in this whole repository (PRINCIPLES.md #1).
+#
+# Write yours before you trust your pipeline. You will find at least one gate
+# that everybody believes is stronger than it is.
+
+name: ci
+
+on:
+  push:
+    branches: [main, staging]
+    # KEEP IN SYNC with the skip-pattern list in skills/deploy-staging.md.
+    # Drift produces either a spurious abort (waiting for a run that will never
+    # start) or a false success (declaring done while a run is still going).
+    paths-ignore: ['**/*.md', 'docs/**']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  lint:
+    # PROVES:          syntax, types, and style rules hold.
+    # DOES NOT PROVE:  the program computes anything correct. A perfectly typed
+    #                  program can return the wrong number every time.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+
+  test:
+    # PROVES:          the tests that exist pass.
+    # DOES NOT PROVE:  the tests cover anything important.
+    #
+    # THE ZERO-TEST GUARD BELOW IS NOT OPTIONAL. A runner that finds no test
+    # files exits 0. "Ran nothing, encountered no failures" is technically
+    # success, and every downstream gate believes it. This actually shipped.
+    # A green result must state HOW MANY things it checked, and zero is a
+    # failure. (PRINCIPLES.md #3)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: Run tests and assert a non-zero count
+        run: |
+          set -o pipefail
+          npm test -- --reporter=json > result.json
+          COUNT=$(jq '.numTotalTests' result.json)
+          echo "tests executed: $COUNT"
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 1 ]; then
+            echo "FAIL: the suite reported success having run $COUNT tests."
+            exit 1
+          fi
+
+  schema-parity:
+    # PROVES:          staging and production schemas match semantically.
+    # DOES NOT PROVE:  either schema is correct, or that the DATA is consistent.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/verify-schema-sync.sh
+
+  migration-safety:
+    # PROVES:          no migration in this change trips a known-dangerous
+    #                  pattern.
+    # DOES NOT PROVE:  a passing migration is safe. It proves only that it
+    #                  isn't dangerous in the specific ways we've been burned
+    #                  by so far. This list grows after every incident — that
+    #                  growth IS the system working.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Scan changed migrations
+        run: |
+          FILES=$(git diff --name-only origin/main...HEAD -- 'migrations/**')
+          [ -z "$FILES" ] && { echo "no migrations changed"; exit 0; }
+          ./scripts/check-migration-safety.sh $FILES
+
+  migrate-dry-run:
+    # PROVES:          the migration APPLIES without erroring, against a real
+    #                  copy of the production schema.
+    # DOES NOT PROVE:  the migration is SAFE. `DROP TABLE customers` applies
+    #                  perfectly cleanly. This distinction is the entire reason
+    #                  the promotion gate exists.
+    runs-on: ubuntu-latest
+    needs: [migration-safety]
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/migrate.sh --dry-run --target production-clone
+
+  deploy-staging:
+    # PROVES:          the artifact built and the host accepted it.
+    # DOES NOT PROVE:  it went to the RIGHT PLACE. A misconfigured working
+    #                  directory once caused the deploy tool to silently create
+    #                  a new hosting project and deploy into that instead.
+    #                  Every command succeeded. Staging never changed.
+    #                  Hence the explicit target assertion below.
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    needs: [lint, test, schema-parity, migrate-dry-run]
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy.sh --env staging
+      - name: Assert deploy target
+        run: |
+          TARGET=$(./scripts/deploy.sh --print-target --env staging)
+          [ "$TARGET" = "$EXPECTED_STAGING_TARGET" ] || {
+            echo "FAIL: deployed to '$TARGET', expected '$EXPECTED_STAGING_TARGET'"
+            exit 1
+          }
+
+  smoke:
+    # PROVES:          the process is running and the router responds.
+    # DOES NOT PROVE:  anything about your business. A site can return 200 on
+    #                  every page while every transaction fails. Treating this
+    #                  as an "is production healthy" check is the single most
+    #                  common overreading of a green pipeline.
+    #
+    # The read-path probe below is the cheapest available upgrade: it forces
+    # one real query through the app's database client, catching bad
+    # environment config and runtime failures on first use.
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    steps:
+      - name: Reachability
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' "https://$STAGING_URL")
+          [ "$code" = "200" ] || { echo "FAIL: homepage $code"; exit 1; }
+      - name: Read path
+        run: |
+          curl -sf "https://$STAGING_URL/api/public/health-with-data" \
+            | jq -e '.items | length > 0' \
+            || { echo "FAIL: reachable but the data path is broken"; exit 1; }
+
+# ---------------------------------------------------------------------------
+# NOT IN THIS FILE, DELIBERATELY
+#
+# Promotion to production is NOT a pipeline job. It's a procedure with a human
+# decision point in the middle — see skills/promote-to-production.md. Automating
+# it end to end would mean automating away the one gate that exists to catch
+# what the automated gates structurally cannot.
+#
+# The pipeline's job is to make the promotion decision well-informed.
+# It is not to make the decision.
+# ---------------------------------------------------------------------------

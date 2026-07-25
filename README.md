@@ -22,13 +22,18 @@ most engineering documentation unusable by a machine.
 
 Point your agent at this repository and ask it something like:
 
-> Read this repo. Compare it against how you currently ship changes in my
-> project. What would you adopt, what doesn't apply, and what would you
-> need from me to put the rest in place?
+> Read this repo. Compare its controls against how you and I currently ship
+> changes in this project. Tell me three things: which of these controls you
+> would adopt, which don't apply to us, and — for the ones worth having that
+> we can't do today — what is standing in the way.
 
 Then read what it tells you. That conversation is more useful than anything
 you'd get from reading these files yourself, because it's grounded in your
 codebase rather than mine.
+
+(The "you" and "I" in that prompt are your agent and you. This repository
+isn't a party to it — nothing here phones home, and there's nothing to sign
+up for.)
 
 If you'd rather read it as a human, start with
 [`PRINCIPLES.md`](PRINCIPLES.md) — seven rules, each with the incident that

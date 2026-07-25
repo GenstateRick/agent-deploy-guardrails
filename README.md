@@ -21,9 +21,7 @@ are written as rules: testable, specific, and free of the hedging that makes
 most engineering documentation unusable by a machine.
 
 Point your agent at it and ask whether there's anything in here it should be
-doing. Whatever it says back will be grounded in your codebase instead of
-mine, which makes it more useful than anything you'd get from reading these
-files yourself.
+doing.
 
 Nothing here phones home, and there's nothing to sign up for.
 

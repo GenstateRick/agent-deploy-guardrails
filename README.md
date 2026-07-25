@@ -16,24 +16,16 @@ moves money.
 
 ## You don't have to read this
 
-It's written to be handed to a coding agent, not studied. The rules are
-written as rules — testable, specific, and free of the hedging that makes
+It's written to be handed to a coding agent rather than studied. The rules
+are written as rules: testable, specific, and free of the hedging that makes
 most engineering documentation unusable by a machine.
 
-Point your agent at this repository and ask it something like:
+Point your agent at it and ask whether there's anything in here it should be
+doing. Whatever it says back will be grounded in your codebase instead of
+mine, which makes it more useful than anything you'd get from reading these
+files yourself.
 
-> Read this repo. Compare its controls against how you and I currently ship
-> changes in this project. Tell me three things: which of these controls you
-> would adopt, which don't apply to us, and — for the ones worth having that
-> we can't do today — what is standing in the way.
-
-Then read what it tells you. That conversation is more useful than anything
-you'd get from reading these files yourself, because it's grounded in your
-codebase rather than mine.
-
-(The "you" and "I" in that prompt are your agent and you. This repository
-isn't a party to it — nothing here phones home, and there's nothing to sign
-up for.)
+Nothing here phones home, and there's nothing to sign up for.
 
 If you'd rather read it as a human, start with
 [`PRINCIPLES.md`](PRINCIPLES.md) — seven rules, each with the incident that

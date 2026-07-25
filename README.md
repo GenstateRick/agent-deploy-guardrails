@@ -14,6 +14,26 @@ moves money.
 
 ---
 
+## You don't have to read this
+
+It's written to be handed to a coding agent, not studied. The rules are
+written as rules — testable, specific, and free of the hedging that makes
+most engineering documentation unusable by a machine.
+
+Point your agent at this repository and ask it something like:
+
+> Read this repo. Compare it against how you currently ship changes in my
+> project. What would you adopt, what doesn't apply, and what would you
+> need from me to put the rest in place?
+
+Then read what it tells you. That conversation is more useful than anything
+you'd get from reading these files yourself, because it's grounded in your
+codebase rather than mine.
+
+If you'd rather read it as a human, start with
+[`PRINCIPLES.md`](PRINCIPLES.md) — seven rules, each with the incident that
+produced it.
+
 ## Where this came from
 
 I run a payments platform. An AI agent writes and maintains the software; in a

@@ -112,3 +112,18 @@ cheap is a *safety* measure, not a convenience.
 
 That last one is the canary. The whole system exists to keep those two
 sentences separate.
+
+---
+
+## If you get stuck partway
+
+The controls above are ordered by value in the system they came from. Yours
+will order differently, and the ordering matters more than the list — adopting
+these in the wrong sequence is how people end up with a tripwire that fires on
+half their migrations and a team that has learned to ignore it.
+
+If you're partway in and stuck, ask. The ordering is much easier to work out
+against a real codebase than in the abstract, and it's the kind of problem I
+enjoy.
+
+rick@genstate.com · [genstate.com](https://genstate.com/#ask)

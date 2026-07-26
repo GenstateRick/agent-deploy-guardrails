@@ -292,3 +292,19 @@ They disagreed, and the pipeline either waited for a run that would never come
 or declared success while a run was still going. They now carry a "keep in
 sync" comment naming each other — the cheapest available fix short of a single
 source of truth, and worth writing down when a single source isn't available.
+
+---
+
+## A second opinion on your own system
+
+The rules are the easy part. The hard part is the two questions this document
+can't answer for you: **which of your gates are lying to you**, and **which of
+these controls are worth their false-positive rate in your system**. Both
+depend on your codebase, your incidents, and what your team will actually
+tolerate.
+
+I can't answer either of those from here. Nobody can; that's kind of the
+point. But they're good puzzles, and I like puzzles. Send me the gate you trust
+least and we'll work out what it actually proves.
+
+rick@genstate.com · [genstate.com](https://genstate.com/#ask)

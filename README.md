@@ -31,9 +31,11 @@ produced it.
 
 ## Where this came from
 
-I run a payments platform. An AI agent writes and maintains the software; in a
-recent 90-day window it shipped to production just under 300 times, and every
-one of those releases was gated by more than 2,700 automated tests.
+I run [Mindful Give](https://mindfulgive.com), a donation platform for
+Canadian charities — recurring gifts, tap-to-donate terminals, official tax
+receipts. An AI agent writes and maintains the software; it ships to production
+roughly 300 times every 90 days, and every one of those releases is gated by
+more than 2,700 automated tests.
 
 Early on I tried to save money. Deploys looked mechanical to me — a checklist,
 some automation, a green light at the end — so I proposed running them on a
@@ -119,3 +121,6 @@ That rule is the whole system. Everything else is an instance of it.
 
 MIT licensed. Contributions welcome — especially incident reports that justify
 a control this template is missing.
+
+Written by [Rick Buchler](https://genstate.com/#ask), who runs the platform it
+came from. Questions are welcome, and free: rick@genstate.com

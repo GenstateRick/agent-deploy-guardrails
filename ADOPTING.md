@@ -19,6 +19,10 @@ Common findings:
 - The smoke test only checks that the homepage loads.
 - The migration check only proves the SQL parses or applies — not that it's
   safe.
+- Nothing executes the database functions your migrations create.
+- The schema comparison is blind to a whole class of change, such as
+  permissions.
+- The end-to-end tests for the feature mock the requests the feature makes.
 - Nothing anywhere exercises the flow that actually makes you money.
 - The staging environment differs from production in a way that makes an entire
   class of bug undetectable before release.
@@ -38,6 +42,11 @@ and line where that control runs, plus a test proving the guarded path is inert
 when the control is off.
 
 Can't cite both? The claim is refused and the change gets full review.
+
+Write each standing exemption with the condition that ends it. The one this
+rule was built for outlived its reason: the flag it depended on was eventually
+on for every customer, nothing behind it was inert, and the exemption was still
+on the page (`PRINCIPLES.md` #6).
 
 It closes the largest hole in any review process, human or machine: the
 plausible assurance nobody checks. It's also the rule that ports furthest
@@ -77,17 +86,30 @@ cheap is a *safety* measure, not a convenience.
    zero, because a tripwire that fires on normal work trains people to ignore
    it (`PRINCIPLES.md` #4).
 
-5. **The escalation list** (`AGENTS.md`) — enumerate what requires a human.
+5. **`scripts/test-guards.sh`** — give every guard a standing pair of fixtures:
+   one input it must pass, one it must catch. Do this before you add another
+   guard, not after. Run against the two guards first published here, it found
+   four defects (`PRINCIPLES.md` #3).
+
+6. **The escalation list** (`AGENTS.md`) — enumerate what requires a human.
    Include the two catch-alls: rules in conflict, and confidence below
    threshold.
 
-6. **Assert the green run matches the commit you're shipping.** A three-line
-   check that closes a genuinely dangerous hole.
+7. **Assert the green run matches the commit you're shipping.** A three-line
+   check that closes a genuinely dangerous hole. If your pipeline skips
+   documentation-only commits, decide in advance what happens when the newest
+   commit is one of them, because no run will ever exist for it.
 
-7. **Capture a rollback target before you merge**, not while you're on fire.
+8. **Capture a rollback target before you promote**, not while you're on fire.
 
-8. **The retrospective that can propose but not edit.** Cheap, and it's what
-   makes the system improve without letting it improve itself unsupervised.
+9. **The retrospective that fixes its own mechanics and only proposes changes
+   to its gates.** Start with propose-only for everything. Let it apply its
+   own fixes once you trust the line between the two, and keep "when unsure,
+   it's a gate" (`PRINCIPLES.md` #7).
+
+10. **Make staging unable to reach real people.** Unsupervised staging deploys
+    are only as safe as staging's outbound doors. Give it a mail server that
+    cannot deliver before you find out it can.
 
 ---
 
@@ -107,6 +129,10 @@ cheap is a *safety* measure, not a convenience.
 - A tripwire is disabled "temporarily."
 - The allowlist of documented exceptions has entries with no clearing
   condition, and nobody remembers who added them.
+- A guard was last seen to fail on purpose the day it was written.
+- A standing exemption is still being claimed after the reason for it ended.
+- A monitor reports a clean run and nobody can say how many things it looked
+  at.
 - A green pipeline is quoted as evidence in a conversation about whether
   something is safe.
 

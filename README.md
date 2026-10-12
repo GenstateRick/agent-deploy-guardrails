@@ -32,10 +32,10 @@ produced it.
 ## Where this came from
 
 I run [Mindful Give](https://mindfulgive.com), a donation platform for
-Canadian charities — recurring gifts, tap-to-donate terminals, official tax
-receipts. An AI agent writes and maintains the software; it ships to production
-roughly 300 times every 90 days, and every one of those releases is gated by
-more than 2,700 automated tests.
+charities — recurring gifts, tap-to-donate terminals, official tax receipts.
+An AI agent writes and maintains the software; it ships roughly 300 changes to
+production every 90 days, in about 70 releases, and every one of those releases
+is gated by more than 12,000 automated tests.
 
 Early on I tried to save money. Deploys looked mechanical to me — a checklist,
 some automation, a green light at the end — so I proposed running them on a
@@ -78,6 +78,7 @@ to narrow the distance between those two things.
 | [`skills/deploy-staging.md`](skills/deploy-staging.md) | Shipping to staging, including multi-agent integration |
 | [`skills/hotfix.md`](skills/hotfix.md) | The emergency path, and the limits that keep it honest |
 | [`scripts/check-migration-safety.sh`](scripts/check-migration-safety.sh) | Scripted tripwires for schema changes |
+| [`scripts/test-guards.sh`](scripts/test-guards.sh) | Trips every guard here on purpose: what each must catch, and what each must let through |
 | [`ci/pipeline.yml`](ci/pipeline.yml) | A CI pipeline annotated with what each job does *not* prove |
 | [`hooks/pre-tool-use.sh`](hooks/pre-tool-use.sh) | Hard blocks enforced outside the agent's judgment |
 | [`ADOPTING.md`](ADOPTING.md) | The three controls to implement first if you do nothing else |
@@ -101,7 +102,7 @@ migration, `next_invoice_number` for a sequence that must never gap.
 - **Not a way to remove humans from deploys.** It's a way to make the human's
   attention land where it's actually needed. The escalation list is the point.
 - **Not a security product.** It reduces the odds of shipping a broken change.
-  It does not replace code review, threat modelling, or an audit.
+  It does not replace code review, threat modeling, or an audit.
 - **Not automatic.** Every control here exists because something went wrong
   first. Yours will be shaped by your own incidents. Copy the structure, then
   let your failures write the specifics.
@@ -116,6 +117,29 @@ incident is considered closed**, so that the same class of mistake cannot
 happen a second time.
 
 That rule is the whole system. Everything else is an instance of it.
+
+---
+
+## Revised October 2026
+
+This was first published in July 2026. Running it since then proved parts of it
+wrong. These are the corrections, each with its incident in
+[`PRINCIPLES.md`](PRINCIPLES.md).
+
+- **Principle 7 is reversed in part.** It said the process may never edit
+  itself. It now fixes its own mechanics and only proposes changes to its
+  gates.
+- **Promotion is a fast-forward.** The pull request is the fallback, not the
+  default.
+- **"The green run is for this commit" had a dead end.** A documentation-only
+  commit never gets a run. The procedure now promotes the last green commit.
+- **The end-to-end suite is judged against a baseline.** Run for long enough,
+  it fails whatever you changed.
+- **The flag exemption outlived its reason,** and no check noticed. Exemptions
+  now carry the condition that ends them.
+- **Staging was not contained.** It sent real email.
+- **The guards had no tests.** They do now. Run against the guards as first
+  published, the tests found four defects.
 
 ---
 

@@ -15,6 +15,11 @@ on:
     # KEEP IN SYNC with the skip-pattern list in skills/deploy-staging.md.
     # Drift produces either a spurious abort (waiting for a run that will never
     # start) or a false success (declaring done while a run is still going).
+    #
+    # CONSEQUENCE FOR PROMOTION: a commit touching only these paths never gets
+    # a run, so it can never be "the commit the green run was for." When one is
+    # the head of staging, the promotion procedure promotes the last green
+    # commit instead (skills/promote-to-production.md, step 2).
     paths-ignore: ['**/*.md', 'docs/**']
   pull_request:
 
@@ -59,9 +64,26 @@ jobs:
             exit 1
           fi
 
+  guards:
+    # PROVES:          each guard still catches the violation it was written
+    #                  for, and still passes the compliant work it must not
+    #                  flag. Every fixture is tripped on purpose, every run.
+    # DOES NOT PROVE:  a guard catches anything it has no fixture for. Run
+    #                  against the guards as first published, this job found
+    #                  four defects in them — and it will find none of the
+    #                  defects nobody has thought to write a fixture for.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/test-guards.sh
+
   schema-parity:
     # PROVES:          staging and production schemas match semantically.
     # DOES NOT PROVE:  either schema is correct, or that the DATA is consistent.
+    #                  It also does not see PERMISSIONS: most schema diff tools
+    #                  compare structure only, so a migration that revokes and
+    #                  re-grants access is green here whether or not it did
+    #                  anything. Verify that class of change directly.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -90,6 +112,13 @@ jobs:
     # DOES NOT PROVE:  the migration is SAFE. `DROP TABLE customers` applies
     #                  perfectly cleanly. This distinction is the entire reason
     #                  the promotion gate exists.
+    #
+    #                  Nor that a FUNCTION OR TRIGGER it creates works. Postgres
+    #                  compiles a procedural function body on first execution,
+    #                  not at creation, so a function with a fatal bug inside
+    #                  applies cleanly here. This job is only evidence about a
+    #                  function if the migration itself executes it — hence the
+    #                  self-test convention in check-migration-safety.sh.
     runs-on: ubuntu-latest
     needs: [migration-safety]
     steps:
@@ -105,7 +134,7 @@ jobs:
     #                  Hence the explicit target assertion below.
     if: github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
-    needs: [lint, test, schema-parity, migrate-dry-run]
+    needs: [lint, test, guards, schema-parity, migrate-dry-run]
     steps:
       - uses: actions/checkout@v4
       - run: ./scripts/deploy.sh --env staging
@@ -150,4 +179,16 @@ jobs:
 #
 # The pipeline's job is to make the promotion decision well-informed.
 # It is not to make the decision.
+#
+# ---------------------------------------------------------------------------
+# TWO THINGS TO CHECK IN YOUR OWN PIPELINE
+#
+# 1. Any job marked continue-on-error. The run's conclusion ignores it, so a
+#    run reads "success" with that job red. If anything downstream depends on
+#    what that job proves, read the per-job results, never the conclusion.
+#
+# 2. Any step that works out "which commit is this" with a fallback. Test the
+#    fallback on purpose. `git rev-parse <missing ref>` prints its argument
+#    before failing, so `$(git rev-parse X || echo "")` yields "X", not empty.
+#    Use `git rev-parse --verify -q X`, which prints nothing on failure.
 # ---------------------------------------------------------------------------

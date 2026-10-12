@@ -3,6 +3,13 @@
 Staging deploys are unsupervised. That's the point — if shipping to staging
 needs approval, nothing else in this system is affordable.
 
+That is only safe if staging cannot reach real people. Before you let anything
+ship here unattended, make its outbound doors — email, text messages, payments,
+calls to third parties — *unable* to deliver: a mail server that cannot send, a
+payment provider in test mode, one client per channel that every send goes
+through. "Nobody would test that against real addresses" is how twelve real
+emails got sent from the original of this system (`PRINCIPLES.md`, appendix).
+
 This procedure also covers the harder case: **several agents working in
 parallel**, each in its own isolated working directory, whose work has to be
 integrated without anyone's changes being lost.
@@ -122,7 +129,15 @@ a decision nobody actually made.
 
 ---
 
-## Step 5 — Assert the shipped set, then push
+## Step 5 — Gate the merged tree, assert the shipped set, then push
+
+Each branch passed its own checks before it was marked ready. That says nothing
+about the tree you just built from several of them. Two branches that are each
+green can fail together: one renames a function, the other adds a caller of the
+old name, and neither diff shows it.
+
+Run the type check and the unit suite here, in the integration directory,
+before the push. This is the first place the combined tree exists.
 
 ```bash
 git diff --stat origin/staging..HEAD
@@ -130,6 +145,20 @@ git diff --stat origin/staging..HEAD
 
 This must contain **exactly** the files from the collected branches. Anything
 unexpected aborts the push.
+
+**Take this diff after the merge, never before it.** A ready branch that is
+*behind* staging — the normal state for work that sat a few days — shows
+everything staging gained in the meantime as deletions when you diff the branch
+against staging's head. One branch that was one commit ahead and 62 behind read
+as 146 files changed and 13,284 lines deleted. The merge itself touched one
+line. Read that pre-merge diff as the gate and you abort a clean deploy over a
+catastrophe that does not exist, or learn to wave the gate through when it
+screams (`PRINCIPLES.md` #4). To see what one branch really contributes, diff
+it from its merge base:
+
+```bash
+git diff --stat "$(git merge-base origin/staging "origin/$B")".."origin/$B"
+```
 
 This check is the one that caught the concurrency incident in step 3 before it
 reached anyone. A diff assertion right before the irreversible step is cheap
@@ -200,14 +229,19 @@ conclusion; wall time.
 
 ---
 
-## Step 9 — Retrospective · suggest-only
+## Step 9 — Retrospective · fix the mechanics, propose the gates
 
 Only if notable: a conflict halted the run, the push was rejected, the build
 failed, a rollback was needed, markers couldn't be cleared, or timing was well
 off expectation. Otherwise write nothing.
 
-If notable, log the proposed amendment and surface two lines. **This step never
-edits this file.** (`PRINCIPLES.md` #7.)
+If notable, sort each change you would make to this file by whether it makes
+any gate fire less often. If it doesn't — a broken command, a failure mode
+worth documenting, a stricter check — apply it after teardown, as its own
+commit, and list it in the report. If it does — the consent marker, the
+halt-on-conflict rule, the shipped-set assertion, the CI gate — log the
+proposed amendment and surface two lines. When unsure, it's a gate.
+**This step never loosens a gate.** (`PRINCIPLES.md` #7.)
 
 ---
 
@@ -218,5 +252,7 @@ edits this file.** (`PRINCIPLES.md` #7.)
 - The marker is the only collection signal. Branch names are not trusted.
 - Integrate only in the disposable per-run directory, off a fresh remote
   staging.
+- Type-check and unit-test the merged tree before pushing it. Green branches do
+  not add up to a green merge.
 - Never force-push. Never bypass commit hooks.
 - Gate on the CI conclusion string, never a watch command's exit code.

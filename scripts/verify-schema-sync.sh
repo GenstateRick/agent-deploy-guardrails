@@ -19,6 +19,21 @@
 #
 # Use a tool that understands the schema (migra, apgdiff, Liquibase diff, or
 # your ORM's equivalent) and compares MEANING.
+#
+# ---------------------------------------------------------------------------
+# WHAT THIS COMPARISON CANNOT SEE
+# ---------------------------------------------------------------------------
+# migra compares the SHAPE of a schema. It does not compare privileges: GRANT,
+# REVOKE and column-level grants do not appear in its output at all. A
+# migration whose whole purpose is to change who may write to a table produces
+# no drift, so this script exits 0 whether or not that migration ran in both
+# environments.
+#
+# "Schemas identical" below means identical in everything this tool looks at.
+# For a privilege change, read the privileges from both databases directly.
+#
+# Every comparator has a list like this one. Find yours and write it here.
+# PRINCIPLES.md #3, "the comparison that could not see the change."
 # ---------------------------------------------------------------------------
 
 set -uo pipefail
@@ -33,7 +48,7 @@ DIFF=$(migra --unsafe "$STAGING_DB_URL" "$PRODUCTION_DB_URL" 2>/dev/null) || {
 }
 
 if [ -z "$DIFF" ]; then
-  echo "schemas identical"
+  echo "schemas identical (structure only — privileges are not compared)"
   exit 0
 fi
 

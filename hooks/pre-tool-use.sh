@@ -20,6 +20,20 @@
 # Keep this list SHORT. A hook that blocks routine work gets bypassed, and a
 # bypassed hook is worse than no hook because it looks like protection.
 # (PRINCIPLES.md #4.)
+#
+# ---------------------------------------------------------------------------
+# TWO THINGS TO KNOW BEFORE YOU TRUST IT
+# ---------------------------------------------------------------------------
+# 1. Every rule below has fixtures in scripts/test-guards.sh: commands it must
+#    refuse and routine commands it must allow, under each bypass marker. The
+#    first published version had none, and rules 3 and 4 each had a hole.
+#    Change a rule, change its fixtures in the same edit.
+#
+# 2. Know which copy runs. Agent tooling loads this file from one configured
+#    place, usually the main checkout and not the branch being worked on. A
+#    change to this hook on a branch is not in force until it is merged and
+#    that checkout is updated. A procedure written against the new behavior
+#    will be refused by the old one.
 # ---------------------------------------------------------------------------
 
 set -uo pipefail
@@ -60,12 +74,34 @@ if grep -qE '(deploy|publish|push).*(--prod|--production)' <<<"$CMD"; then
 fi
 
 # --- 3. Staging-first git discipline -----------------------------------------
-# Hotfix mode lifts exactly this restriction and nothing else.
+# Refuses any push whose DESTINATION is the production branch, in every form
+# git accepts: `origin main`, `HEAD:main`, `<hash>:main`, `x:refs/heads/main`.
+# The first version of this rule matched only `origin main`, so every refspec
+# form of the same push went straight through. scripts/test-guards.sh found it.
+#
+# Two procedures lift it, each as narrowly as it can be written:
+#
+#   hotfix mode     a push to the production branch, and nothing else.
+#   promotion mode  EXACTLY one of the two promotion pushes, as the whole
+#                   command: the staging tip, or a full 40-character commit
+#                   hash. The hash must be typed in full because this hook
+#                   reads the command's text. A variable or an abbreviation
+#                   is a push it cannot verify, so it is refused.
 
-if grep -qE 'git +push +.*origin +(main|master)\b' <<<"$CMD"; then
-  [ "$HOTFIX_ACTIVE" -eq 1 ] \
-    || deny "direct push to the production branch" \
-            "Normal flow is feature -> staging -> production. For emergencies use the hotfix procedure."
+# Only the push commands themselves, so `git log main && git push origin x`
+# is judged on its push and not on the word "main" somewhere else.
+PUSHES=$(grep -oE 'git +push[^;&|]*' <<<"$CMD" || true)
+
+if grep -qE '(^| )\+?([^ ]*:)?(refs/heads/)?(main|master)( |$)' <<<"$PUSHES"; then
+  if [ "$HOTFIX_ACTIVE" -eq 1 ]; then
+    : # the hotfix procedure's push
+  elif [ "$PROMOTION_ACTIVE" -eq 1 ] \
+       && grep -qE '^git push origin (origin/staging|[0-9a-f]{40}):main$' <<<"$CMD"; then
+    : # the promotion procedure's fast-forward
+  else
+    deny "direct push to the production branch" \
+         "Normal flow is feature -> staging -> production. Promotion and hotfix each have a procedure."
+  fi
 fi
 
 # --- 4. Never rewrite shared history -----------------------------------------
@@ -74,6 +110,11 @@ fi
 if grep -qE 'git +push +.*(--force|-f)\b' <<<"$CMD" \
    && ! grep -q -- '--force-with-lease' <<<"$CMD"; then
   deny "force push" "Rewriting shared history is a human decision, made deliberately."
+fi
+
+# A leading "+" on a refspec is a force push with no flag to grep for.
+if grep -qE '(^| )\+[^ ]+' <<<"$PUSHES"; then
+  deny "force push (+refspec)" "Rewriting shared history is a human decision, made deliberately."
 fi
 
 # --- 5. Never bypass the checks ----------------------------------------------

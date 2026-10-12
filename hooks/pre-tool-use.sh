@@ -143,7 +143,7 @@ exit 0
 #
 # Reading production. Diagnosis is most of the work, and an agent that can't
 # look will guess instead — which is the failure mode you were preventing.
-# Reads are pre-authorised; writes never are. See AGENTS.md, "read/write
+# Reads are pre-authorized; writes never are. See AGENTS.md, "read/write
 # asymmetry", including the two conditions: convert personal data to booleans
 # at the query, and treat any function call as a write regardless of the verb.
 # ---------------------------------------------------------------------------

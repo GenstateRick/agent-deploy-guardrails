@@ -22,7 +22,7 @@ Worked examples from a real pipeline:
   is running and the router works. It proves nothing about whether payments,
   receipts, or webhooks function. A site can return 200 on every page while
   every transaction fails.
-- A **build** proves the code compiles. It says nothing about behaviour.
+- A **build** proves the code compiles. It says nothing about behavior.
 - **Type checks and linting** prove internal consistency. A perfectly typed
   program can compute the wrong number.
 - A migration that **creates a database function** proves the function was
@@ -91,7 +91,7 @@ is a union of two things:
 The content half is what catches money moving in a file the path list never
 anticipated. It will happen. Design for it.
 
-**This generalises past software.** Every approval process in every company has
+**This generalizes past software.** Every approval process in every company has
 this problem: one review standard applied to a $200 expense and a $2M contract.
 The fix is the same — compute the scrutiny from the properties of the thing.
 
@@ -221,7 +221,7 @@ All four had been public, and described as controls, since the first version.
 
 ## 4. A control that fires on compliant work is worse than no control
 
-This one cost the most to learn and generalises the furthest.
+This one cost the most to learn and generalizes the furthest.
 
 Policy required every schema migration to include a rollback section — the SQL
 that reverses it. A separate safety check scanned migrations for destructive
@@ -240,7 +240,7 @@ existed to catch a genuinely destructive change.
 required rollback block cannot trip the wire.
 
 It happened a second time, in a subtler form. A check flagged any migration
-that replaced an existing database function, since replacing behaviour isn't
+that replaced an existing database function, since replacing behavior isn't
 additive. But the codebase's convention used the same "create or replace"
 syntax for brand-new functions too. The naive check hit roughly 43% of
 migrations.
@@ -311,7 +311,7 @@ approval of the batch:
 4. Anything touching the flag that controls a staged rollout
 5. Weakening a security control — auth checks, rate limits, row-level security,
    content security policy
-6. Writes to a production database that weren't authorised this session
+6. Writes to a production database that weren't authorized this session
 7. Changes to secrets, environment variables, or credential configuration
 8. Deleting or renaming files
 9. Adding an external service that will handle user data
@@ -349,7 +349,7 @@ production write is the human's to run, never the agent's to re-route.
 
 ## 6. Claimed exemptions require evidence, not assertion
 
-Some categories of change are pre-authorised — in the original system, work
+Some categories of change are pre-authorized — in the original system, work
 behind a specific feature flag could proceed without stopping, because the flag
 guaranteed the code path was inert in production.
 
@@ -370,7 +370,7 @@ because "this is fine, it's covered by X" is a claim, and claims are checkable.
 Asking for the citation is nearly free. Accepting the assertion is a bet on a
 claim nobody checked.
 
-It's also the control that transfers most cleanly to human organisations, where
+It's also the control that transfers most cleanly to human organizations, where
 "don't worry, legal already looked at it" is load-bearing far more often than
 anyone is comfortable admitting.
 
@@ -472,7 +472,7 @@ Smaller lessons, each of which is now a check somewhere in the system.
 routine removed directories whose branches were fully merged. A freshly created
 one qualified — and held hours of uncommitted work. The guard now refuses to
 remove any directory with uncommitted changes, and the date of the loss is in
-the comment so nobody optimises it away.
+the comment so nobody optimizes it away.
 
 **Concurrency needs isolation, not care.** Two deploys running at once shared a
 fixed scratch directory. The second reused the first's path, a branch creation

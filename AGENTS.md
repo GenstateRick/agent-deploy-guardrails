@@ -42,9 +42,9 @@ remembers not to use them.
 2. **Data-mutating migrations.** Backfills, `UPDATE` statements, replacing an
    existing function, view, trigger, or policy. These are *not* additive
    regardless of how the change is described.
-3. **Writes to a production database** not explicitly authorised this session.
+3. **Writes to a production database** not explicitly authorized this session.
 4. **Anything touching payment processing or financial-document generation**,
-   outside a narrow pre-authorised scope (see the evidence rule below).
+   outside a narrow pre-authorized scope (see the evidence rule below).
 5. **The staged-rollout flag.** Flipping it in code, migration, or seed data;
    removing a gate that reads it. Rollout is an operational decision.
 6. **Secrets, environment variables, credential configuration.**
@@ -72,8 +72,8 @@ denied production write is the human's to run, never the agent's to re-route.
 
 ## The read/write asymmetry
 
-Reading production is pre-authorised at all times. Writing to it is never
-pre-authorised.
+Reading production is pre-authorized at all times. Writing to it is never
+pre-authorized.
 
 This turns out to matter more than it sounds. Diagnosis is most of the work,
 and forcing an approval round-trip on every read makes the agent guess instead
@@ -93,11 +93,11 @@ Two conditions on the reads:
 
 ## Evidence, not assertion
 
-Some work is pre-authorised as a category — in the original system, changes
+Some work is pre-authorized as a category — in the original system, changes
 behind a specific feature flag, because the flag made the code path inert in
 production.
 
-**Claiming that pre-authorisation requires citing evidence.** Specifically: the
+**Claiming that pre-authorization requires citing evidence.** Specifically: the
 file and line of the server-side check that runs *before* the risky operation,
 and the test proving the path does nothing when the flag is off. Cannot cite
 both? The exemption is refused and the change escalates.
@@ -112,8 +112,8 @@ inert, and the exemption was still on the page. Write the ending condition as a
 fact someone can look up. When it stops holding, the exemption is gone whether
 or not anyone has edited this document.
 
-This is the highest-leverage rule in the document. It generalises to every
-organisation where "don't worry, legal already looked at it" carries weight it
+This is the highest-leverage rule in the document. It generalizes to every
+organization where "don't worry, legal already looked at it" carries weight it
 hasn't earned.
 
 ---
@@ -124,7 +124,7 @@ hasn't earned.
 not "the demo worked."
 
 For this project, done means: the build passes, the relevant tests pass, new
-user-facing behaviour has a test that would fail if the behaviour regressed,
+user-facing behavior has a test that would fail if the behavior regressed,
 and — for anything touching a browser surface — a test that drives the page
 like a user and fails loudly if the page misbehaves.
 
@@ -147,7 +147,7 @@ Two more clauses, each added after the gap it closes was found:
 
 - **Exploration before proposal.** Read the code before suggesting changes to
   it.
-- **Smallest testable change.** Don't refactor, optimise, or improve outside
+- **Smallest testable change.** Don't refactor, optimize, or improve outside
   the current goal.
 - **Never suppress a check.** No skipping hooks, no disabling a failing test to
   get green, no adding an exception to silence a comparison tool. If a control

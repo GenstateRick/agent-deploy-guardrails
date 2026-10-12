@@ -222,7 +222,7 @@ reviewer twice. Diversity of lens catches what redundancy can't:
   note if destructive. Every function or trigger a migration defines is
   *executed* by a test in that migration — a function that was only created
   has not been checked by anything. The staged-rollout flag never written by
-  code, seed, or migration. Legacy payment paths behaviourally unchanged.
+  code, seed, or migration. Legacy payment paths behaviorally unchanged.
 - *Reviewer B — security.* No cardholder data added to schema, logs, or
   application state. No secrets or credential config touched. No row-level
   security policy weakened or dropped. Content security policy not broadened.
@@ -242,7 +242,7 @@ Three rules for running reviewers as separate agents:
   yourself before accepting it. If your number disagrees with theirs, check
   your own filter first — print the whole partition, not the filtered count.
 
-**4c. Behavioural gates.** Run these while the reviewers work:
+**4c. Behavioral gates.** Run these while the reviewers work:
 
 - **The full end-to-end suite, compared against a baseline** — not the smoke
   subset, and not judged on whether it passes. A long suite against a shared
@@ -278,7 +278,7 @@ Three rules for running reviewers as separate agents:
 - **Any `TRIPWIRE` → hard stop.** Print every finding verbatim with file and
   line. Do not promote. Require an explicit per-finding human decision. If not
   approved: run step 9, exit.
-- **Pre-authorised exemptions are reported but don't auto-stop** — *provided
+- **Pre-authorized exemptions are reported but don't auto-stop** — *provided
   they're evidenced.* Cite the file and line of the gate that runs before the
   risky call, and the test proving the path is inert when the flag is off.
   **Cannot cite both? The finding stays a hard stop.** (Principle 6.)

@@ -117,7 +117,7 @@ for f in "$@"; do
     if git grep -Eil "(FUNCTION|VIEW)[[:space:]]+(public\.)?${short}[[:space:](]" \
          "$UPSTREAM" -- "$MIGRATION_GLOB" 2>/dev/null \
          | grep -qv "$(basename "$f")"; then
-      trip "$f REPLACES existing object ${obj} — behaviourally destructive, not additive"
+      trip "$f REPLACES existing object ${obj} — behaviorally destructive, not additive"
     fi
   done < <(grep -Eio 'CREATE OR REPLACE (FUNCTION|VIEW)[[:space:]]+[a-zA-Z0-9_."]+' <<<"$SQL" \
              | awk '{print $NF}' | sed 's/(.*//' | sort -u)

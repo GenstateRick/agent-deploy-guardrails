@@ -102,7 +102,7 @@ migration, `next_invoice_number` for a sequence that must never gap.
 - **Not a way to remove humans from deploys.** It's a way to make the human's
   attention land where it's actually needed. The escalation list is the point.
 - **Not a security product.** It reduces the odds of shipping a broken change.
-  It does not replace code review, threat modelling, or an audit.
+  It does not replace code review, threat modeling, or an audit.
 - **Not automatic.** Every control here exists because something went wrong
   first. Yours will be shaped by your own incidents. Copy the structure, then
   let your failures write the specifics.

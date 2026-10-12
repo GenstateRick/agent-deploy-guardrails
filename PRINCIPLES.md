@@ -181,11 +181,12 @@ the one everybody thought it was answering.**
 
 ### A guard proven once is decoration
 
-Every check in this repository was demonstrated by hand on the day it was
-written: fed one input it should pass and one it should catch. Then none of
-them was tripped again. A guard that has silently stopped catching looks
-exactly like a guard with nothing to catch, and "it worked when I wrote it" is
-the same sentence as "the suite ran zero tests and passed."
+The migration check published here was demonstrated by hand on the day it was
+written: fed one input it should pass and one it should catch. Then nothing
+tripped it again, and nothing in the repository tripped the hook at all. A
+guard that has silently stopped catching looks exactly like a guard with
+nothing to catch, and "it worked when I wrote it" is the same sentence as "the
+suite ran zero tests and passed."
 
 Maziyar P. of OpenMed said it better than I had, replying in public to a
 comment of mine: *a guard nobody has deliberately tripped is not a control, it
@@ -278,9 +279,9 @@ Two limits, both learned by getting them wrong:
 - **The comparison can only clear a failure it can tell apart.** On a shared
   staging database, a schema-level fault fails on both sides — the change and
   the baseline are talking to the same database — so the comparison files it
-  under existing decay. The audit trigger in principle 1 failed in exactly
-  that way, identically on both sides. When the failure is a database error,
-  the baseline does not get a vote.
+  under existing decay. A fault like the audit trigger in principle 1 fails
+  identically on both sides. When the failure is a database error, the
+  baseline does not get a vote.
 - **Check that the comparison compares.** The two failure lists have to be
   normalized before they are diffed. One normalizing step used a pattern its
   tool silently did not support, so it changed nothing, and the diff reported
@@ -315,6 +316,12 @@ approval of the batch:
 7. Changes to secrets, environment variables, or credential configuration
 8. Deleting or renaming files
 9. Adding an external service that will handle user data
+10. Anything touching payment processing or financial-document generation,
+    outside a narrow pre-authorized scope (principle 6)
+11. Deploying to production — always, including "just this one small fix"
+
+`AGENTS.md` carries the same list in the form the agent reads. It folds items
+2 and 3 into one.
 
 Plus two catch-alls that matter more than the specifics:
 
@@ -537,9 +544,9 @@ fixes made in response to findings contained findings of their own.
 
 **When your re-check disagrees with a delegate, suspect your own question
 first.** The rule is to re-derive the riskiest claim in any all-clear that came
-from a cheaper model. Once, the re-derived number disagreed by a factor of
-four, and the delegate was right: the re-check had used a wider filter and
-swept in 2,588 rows that were out of scope by design. A disagreement is a
+from a cheaper model. Once, one of the re-derived numbers came out four times
+the delegate's, and the delegate was right: the re-check had used a wider
+filter and swept in 2,588 rows that were out of scope by design. A disagreement is a
 third hypothesis, not a verdict. Print the whole partition, not the filtered
 count, before deciding who is wrong.
 

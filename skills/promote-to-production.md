@@ -114,8 +114,9 @@ This holds only if *every* file in that diff matches the pipeline's skip
 patterns. One file that doesn't, and it is the first case. List the files left
 behind in the final report. They ship with the next promotion.
 
-Do not promote the head as a one-time exception, and do not manufacture a
-code-touching commit to force a run. Both turn "the green run is for this
+Do not promote the head on your own as a one-time exception — shipping a
+commit that no run was ever for is a human's decision — and do not manufacture
+a code-touching commit to force a run. Both turn "the green run is for this
 commit" from an assertion into a habit of making exceptions.
 
 This is not a rare case if you adopt step 10. Every fix this procedure applies
@@ -503,8 +504,8 @@ The next promotion will meet it in step 2.
   skipped.
 - The end-to-end baseline may only ever pass the gate. It never clears a
   database error.
-- Fix forward for migration failures; roll back for code, deploy, and smoke
-  failures.
+- Fix forward for migration failures; retry a failed deploy job; roll back for
+  smoke and read-path failures.
 - The promotion flag is created in step 0 and removed in step 9 on every path.
 - Step 10 applies mechanics and proposes gates. It never loosens a gate. When
   unsure, it's a gate.
